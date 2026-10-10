@@ -1,0 +1,25 @@
+# Environment & Secret files
+.env
+*.env
+!.env.example
+
+# IDE & Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Java & Build files
+target/
+build/
+.gradle/
+*.class
+*.jar
+
+# Node & Frontend
+node_modules/
+dist/
+
+# Logs & Docker data
+data/
+*.log
