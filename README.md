@@ -11,6 +11,7 @@ A web application being developed to organize legal cases, client records, and c
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
 - [Running the application](#running-the-application)
+- [Docker Compose](#docker-compose)
 - [Build and checks](#build-and-checks)
 - [Continuous integration](#continuous-integration)
 - [Development workflow](#development-workflow)
@@ -175,6 +176,66 @@ sh ./mvnw spring-boot:run
 
 Copy the example properties file using your editor or `cp`.
 
+## Docker Compose
+
+This optional local setup starts frontend, backend, and a separate PostgreSQL 18
+database. Install Docker Desktop with Linux containers and start its engine first.
+Your existing locally installed PostgreSQL database is not changed or imported.
+
+From the repository root, create the Compose settings file once:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Open `.env`, replace both password examples with different strong passwords, and
+save it. This file is ignored by Git. For passwords containing `$` or `#`, use
+single quotes around the entire value in `.env` to preserve it literally.
+These Compose settings are independent of `application-local.properties`.
+The backend local credentials file is excluded from its Docker build context.
+
+Stop any existing frontend/backend servers with `Ctrl+C` before using the same
+ports. Alternatively, set `COMPOSE_BACKEND_PORT=8081` and
+`COMPOSE_FRONTEND_PORT=5174` in `.env`.
+
+```powershell
+docker compose up --build -d --wait
+docker compose ps
+```
+
+With the default ports, open **http://localhost:5173** for the frontend and
+**http://localhost:8080/login** to check backend availability.
+
+- PostgreSQL initializes an empty database in a persistent named volume.
+- An initialization script creates the `diary_app` login with connection
+  permission, separate from the administrator. It creates no application tables.
+- Backend startup waits for PostgreSQL health; frontend startup waits for the
+  backend login endpoint to respond.
+- PostgreSQL has no published host port. Backend connects using the Compose
+  service hostname `postgres`; your host PostgreSQL can continue using port 5432.
+- Application ports are bound to the local machine only.
+- The frontend uses Vite's development server. Source edits require a rebuild;
+  this setup does not mount your source directories for hot reload.
+- Backend image packaging skips tests because the database is unavailable during
+  image builds. Run tests separately or use CI before merging.
+
+View logs and stop the stack:
+
+```powershell
+docker compose logs --tail=100 backend
+docker compose logs --tail=100 frontend
+docker compose down
+```
+
+`down` keeps the database volume. Initial database credentials and role creation
+are applied only to a new volume: editing `.env` does not change existing database
+passwords. Change them through PostgreSQL administration when retaining data.
+`docker compose down -v` deletes the database volume and all data in it; use it
+only when intentionally discarding this Docker database.
+
+This is a local development setup. Production deployment requires a separate
+review of authentication, secrets, TLS, backups, and frontend serving.
+
 ## Build and checks
 
 ### Backend
@@ -256,6 +317,6 @@ Run relevant checks, review your diff for credentials, then commit and push your
 - Implement application authentication and authorization.
 - Build legal case, client, and court diary modules.
 - Connect frontend screens to backend APIs and expand tests.
-- Add Docker Compose for repeatable local startup.
+- Add automated Docker image and Compose smoke checks to CI.
 
 These are intended next steps, not features currently available.
