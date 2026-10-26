@@ -3,3 +3,7 @@
 DB_URL=jdbc:postgresql://localhost:5432/your_database_name
 DB_USERNAME=your_database_user
 DB_PASSWORD=your_database_password
+
+# Optional: separate schema owner login for Flyway (otherwise uses DB_USERNAME).
+# DB_MIGRATION_USERNAME=your_migration_user
+# DB_MIGRATION_PASSWORD=your_migration_password

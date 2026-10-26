@@ -24,4 +24,23 @@ class DiaryBackendApplicationTests {
 		}
 	}
 
+	@Test
+	void flywayCreatesTheApprovedSchema() throws Exception {
+		try (Connection connection = dataSource.getConnection()) {
+			for (String table : new String[] {"roles", "users", "clients", "cases",
+					"case_assignments", "hearings", "diary_notes", "document_types",
+					"documents", "activity_history"}) {
+				try (var tables = connection.getMetaData().getTables(null, "public", table, new String[] {"TABLE"})) {
+					assertTrue(tables.next(), "Missing table: " + table);
+				}
+			}
+			try (var statement = connection.createStatement();
+				 var result = statement.executeQuery(
+					 "SELECT count(*) FROM flyway_schema_history WHERE version = '1' AND success")) {
+				assertTrue(result.next());
+				assertEquals(1, result.getInt(1));
+			}
+		}
+	}
+
 }
