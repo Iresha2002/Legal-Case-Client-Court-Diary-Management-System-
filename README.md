@@ -36,7 +36,7 @@ A web application being developed to organize legal cases, client records, and c
 | Build and tests | Maven Wrapper, JUnit, Spring Boot Test | Backend build and integration checks |
 | Automation | GitHub Actions | Backend and frontend CI |
 
-Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](frontend/package.json), and the frontend lockfile. H2 dependencies are also present, but PostgreSQL is the configured application database.
+Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](frontend/package.json), and the frontend lockfile. The backend starts without PostgreSQL: if `DB_URL` is unset it uses an in-memory H2 database. Set `DB_URL`, `DB_USERNAME` and `DB_PASSWORD` to connect to PostgreSQL.
 
 ## Project structure
 
@@ -105,12 +105,14 @@ Open the new `application-local.properties` file and replace the example values:
 DB_URL=jdbc:postgresql://localhost:5432/legal_diary
 DB_USERNAME=your_database_user
 DB_PASSWORD=your_database_password
+JWT_SECRET=a_long_random_secret_of_at_least_32_bytes
 ```
 
 - Replace `legal_diary` with the database name you actually created.
 - Use PostgreSQL login credentials, which may differ from pgAdmin's master password.
 - Do not surround values with quotes. Save the file before starting the backend.
-- Leave `${DB_URL}`, `${DB_USERNAME}`, and `${DB_PASSWORD}` in shared configuration unchanged.
+- Generate `JWT_SECRET` yourself (for example `openssl rand -base64 48`); never reuse one from the repository history.
+- Leave `${DB_URL}`, `${DB_USERNAME}`, `${DB_PASSWORD}`, and `${JWT_SECRET}` in shared configuration unchanged.
 - Never commit the local credentials file or place passwords in shared configuration.
 
 Environment variables with the same names can supply these settings instead. A plain `.env` file is not automatically loaded by this backend configuration.
@@ -188,8 +190,8 @@ From the repository root, create the Compose settings file once:
 Copy-Item .env.example .env
 ```
 
-Open `.env`, replace both password examples with different strong passwords, and
-save it. This file is ignored by Git. For passwords containing `$` or `#`, use
+Open `.env`, replace both password examples with different strong passwords, set
+`COMPOSE_JWT_SECRET` to a long random value, and save it. This file is ignored by Git. For passwords containing `$` or `#`, use
 single quotes around the entire value in `.env` to preserve it literally.
 These Compose settings are independent of `application-local.properties`.
 The backend local credentials file is excluded from its Docker build context.
@@ -204,13 +206,14 @@ docker compose ps
 ```
 
 With the default ports, open **http://localhost:5173** for the frontend and
-**http://localhost:8080/login** to check backend availability.
+**http://localhost:8080/login** to check backend availability (the default Spring Security
+login page).
 
 - PostgreSQL initializes an empty database in a persistent named volume.
 - An initialization script creates the `diary_app` login with connection
   permission, separate from the administrator. It creates no application tables.
 - Backend startup waits for PostgreSQL health; frontend startup waits for the
-  backend login endpoint to respond.
+  backend port to accept connections.
 - PostgreSQL has no published host port. Backend connects using the Compose
   service hostname `postgres`; your host PostgreSQL can continue using port 5432.
 - Application ports are bound to the local machine only.
