@@ -41,6 +41,8 @@ jobs:
       DB_URL: jdbc:postgresql://localhost:5432/diary_ci
       DB_USERNAME: diary_ci
       DB_PASSWORD: diary_ci_password
+      # Disposable CI secret only.
+      JWT_SECRET: ci-only-jwt-secret-not-for-real-use-0123456789abcdef
     steps:
       - name: Check out source
         uses: actions/checkout@v7
