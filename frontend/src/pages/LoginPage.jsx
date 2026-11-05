@@ -3,6 +3,8 @@ import Button from '../components/ui/Button.jsx';
 import TextField from '../components/ui/TextField.jsx';
 import PasswordField from '../components/ui/PasswordField.jsx';
 import Checkbox from '../components/ui/Checkbox.jsx';
+import { login } from '../api/auth.js';
+import { saveSession } from '../auth/session.js';
 import scaleIcon from '../assets/icons/scale.svg';
 import loginBg from '../assets/images/login-bg.jpg';
 
@@ -45,31 +47,48 @@ function BrandPanel() {
   );
 }
 
-function validate({ identifier, password }) {
+// Same rule and message as the backend, so the user sees the problem before sending.
+const MIN_PASSWORD_LENGTH = 8;
+
+function validate({ email, password }) {
   const errors = {};
-  if (!identifier.trim()) errors.identifier = 'Enter your email or username.';
+  if (!email.trim()) errors.email = 'Enter your email.';
   if (!password) errors.password = 'Enter your password.';
+  else if (password.length < MIN_PASSWORD_LENGTH) errors.password = 'Password must be at least 8 characters.';
   return errors;
 }
 
-export default function LoginPage() {
-  const [form, setForm] = useState({ identifier: '', password: '', remember: false });
+// onLogin is called with the session after a successful login.
+export default function LoginPage({ onLogin }) {
+  const [form, setForm] = useState({ email: '', password: '', remember: false });
   const [errors, setErrors] = useState({});
-  const [notice, setNotice] = useState('');
+  const [serverError, setServerError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const update = (field) => (value) => {
     setForm((f) => ({ ...f, [field]: value }));
     setErrors((e) => ({ ...e, [field]: undefined }));
+    setServerError('');
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const found = validate(form);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
-    // TODO: call the backend login endpoint once it exists (no auth controller yet).
-    setNotice('Sign-in is not connected to the server yet.');
+    setSubmitting(true);
+    setServerError('');
+    try {
+      const session = await login(form.email.trim(), form.password);
+      saveSession(session, form.remember);
+      onLogin?.(session);
+    } catch (error) {
+      // The message comes from the backend, for example "Incorrect email or password."
+      setServerError(error.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -89,13 +108,14 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
             <TextField
-              label="Email or username"
-              name="identifier"
+              label="Email"
+              name="email"
+              type="email"
               autoComplete="username"
-              placeholder="Enter your email or username"
-              value={form.identifier}
-              onChange={(e) => update('identifier')(e.target.value)}
-              error={errors.identifier}
+              placeholder="Enter your email"
+              value={form.email}
+              onChange={(e) => update('email')(e.target.value)}
+              error={errors.email}
             />
             <PasswordField
               label="Password"
@@ -114,13 +134,15 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {notice && (
-              <p role="status" className="rounded-sm border border-border-default bg-bg-page px-4 py-3 text-body text-text-primary">
-                {notice}
+            {serverError && (
+              <p role="alert" className="rounded-sm border border-red-600 bg-bg-page px-4 py-3 text-body text-red-600">
+                {serverError}
               </p>
             )}
 
-            <Button type="submit">Log In</Button>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? 'Logging in…' : 'Log In'}
+            </Button>
           </form>
 
           <div className="flex items-center gap-3">
