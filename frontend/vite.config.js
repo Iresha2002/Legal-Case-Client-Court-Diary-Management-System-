@@ -14,7 +14,14 @@ export default defineConfig({
     // The browser calls /api on the frontend's own address and Vite forwards it to the
     // backend, so there are no CORS problems in development. Docker sets the backend address.
     proxy: {
-      '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:8080',
+      '/api': {
+        target: process.env.API_PROXY_TARGET ?? 'http://localhost:8080',
+        // The browser sees a same-origin request, so drop its Origin header; otherwise the
+        // backend's CORS check rejects addresses like http://127.0.0.1:5174 with 403.
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyRequest) => proxyRequest.removeHeader('origin'));
+        },
+      },
     },
   },
 })
