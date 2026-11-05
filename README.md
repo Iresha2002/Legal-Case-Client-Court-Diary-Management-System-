@@ -11,6 +11,7 @@ A web application being developed to organize legal cases, client records, and c
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
 - [Running the application](#running-the-application)
+- [How login works](#how-login-works)
 - [Docker Compose](#docker-compose)
 - [Build and checks](#build-and-checks)
 - [Continuous integration](#continuous-integration)
@@ -28,7 +29,7 @@ A web application being developed to organize legal cases, client records, and c
 | Code quality | ESLint 10 | Frontend lint checks |
 | Backend | Java 21, Spring Boot 4.1.1 | Backend application |
 | Web layer | Spring Web MVC | Foundation for HTTP APIs |
-| Security | Spring Security | Default development login currently enabled |
+| Security | Spring Security, BCrypt, JJWT | Token login; see [How login works](#how-login-works) |
 | Persistence | Spring Data JPA, Hibernate, PostgreSQL JDBC | Database access |
 | Database | PostgreSQL 18 | Relational database |
 | Migrations | Flyway | Versioned PostgreSQL schema migrations |
@@ -36,7 +37,7 @@ A web application being developed to organize legal cases, client records, and c
 | Build and tests | Maven Wrapper, JUnit, Spring Boot Test | Backend build and integration checks |
 | Automation | GitHub Actions | Backend and frontend CI |
 
-Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](frontend/package.json), and the frontend lockfile. PostgreSQL is required: set `DB_URL`, `DB_USERNAME` and `DB_PASSWORD` (Flyway applies the schema on startup). `JWT_SECRET` should be set before authentication is added.
+Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](frontend/package.json), and the frontend lockfile. PostgreSQL is required: set `DB_URL`, `DB_USERNAME` and `DB_PASSWORD` (Flyway applies the schema on startup). `JWT_SECRET` (at least 32 characters) is required; the backend refuses to start without it.
 
 ## Project structure
 
@@ -111,7 +112,8 @@ JWT_SECRET=a_long_random_secret_of_at_least_32_bytes
 - Replace `legal_diary` with the database name you actually created.
 - Use PostgreSQL login credentials, which may differ from pgAdmin's master password.
 - Do not surround values with quotes. Save the file before starting the backend.
-- Generate `JWT_SECRET` yourself (for example `openssl rand -base64 48`); never reuse one from the repository history.
+- Generate `JWT_SECRET` yourself (for example `openssl rand -base64 48`); never reuse one from the repository history. It must be at least 32 characters.
+- Optional: `JWT_EXPIRATION_MINUTES` (default `60`) and `APP_CORS_ALLOWED_ORIGIN` (default `http://localhost:5173`). See [How login works](#how-login-works).
 - Leave `${DB_URL}`, `${DB_USERNAME}`, `${DB_PASSWORD}`, and `${JWT_SECRET}` in shared configuration unchanged.
 - Never commit the local credentials file or place passwords in shared configuration.
 
@@ -147,10 +149,10 @@ Wait for `Started DiaryBackendApplication`. The terminal stays occupied while th
 | Service | Local address |
 | --- | --- |
 | Backend | http://localhost:8080 |
-| Default security login | http://localhost:8080/login |
+| Login API | `POST` http://localhost:8080/api/v1/auth/login |
 | Frontend | Usually http://localhost:5173; use the URL printed by Vite |
 
-The login page confirms HTTP availability. Its credentials are separate from PostgreSQL credentials. Spring Security currently uses the development username `user` and a generated password printed in backend startup logs. Application-specific authentication is still to be implemented.
+Opening http://localhost:8080 in a browser shows a `401` JSON error. That is expected: it confirms the backend is running, and every address except login needs a token.
 
 ### Terminal 2: frontend
 
@@ -177,6 +179,34 @@ sh ./mvnw spring-boot:run
 ```
 
 Copy the example properties file using your editor or `cp`.
+
+## How login works
+
+Users log in with their email and password and receive a signed token (JWT). The React app sends this token with every request.
+
+1. The app sends `POST /api/v1/auth/login` with `{"email": "...", "password": "..."}`.
+2. The backend finds the user (email ignores upper/lower case and outer spaces) and checks the password against the BCrypt hash in `users.password_hash`.
+3. On success it returns `token`, `expiresAt`, `userId`, `name` and `role`. The password and its hash are never returned.
+4. The app sends `Authorization: Bearer <token>` with every other request. A missing, changed or expired token gets `401`.
+5. `POST /api/v1/auth/logout` returns `204`. The app must then delete its copy of the token.
+
+| Role in `roles.name` | Role in the token |
+| --- | --- |
+| Senior Lawyer | `ROLE_SENIOR_LAWYER` |
+| Junior Lawyer | `ROLE_JUNIOR_LAWYER` |
+| Clerk | `ROLE_CLERK` |
+
+- Only these three roles can log in. The Administrator View belongs to the Senior Lawyer account; it is not a separate role.
+- A wrong email, a wrong password and any other role get the same message: `Incorrect email or password.` A switched-off account (`is_active = false`) cannot log in.
+- Passwords must be at least 8 characters.
+- Errors use one JSON format: `{"status": 401, "error": "Unauthorized", "message": "..."}`. No stack traces are sent.
+- **Logout limits:** tokens are stateless, so the server cannot cancel one. Logout works because the app forgets its token; a copied token stays valid until it expires.
+
+| Setting | Required | Default | Purpose |
+| --- | --- | --- | --- |
+| `JWT_SECRET` | Yes | none | Signs tokens. At least 32 characters; the backend refuses to start otherwise. |
+| `JWT_EXPIRATION_MINUTES` | No | `60` | How long a token stays valid. |
+| `APP_CORS_ALLOWED_ORIGIN` | No | `http://localhost:5173` | The frontend address allowed to call the API from a browser. |
 
 ## Docker Compose
 
@@ -206,8 +236,7 @@ docker compose ps
 ```
 
 With the default ports, open **http://localhost:5173** for the frontend and
-**http://localhost:8080/login** to check backend availability (the default Spring Security
-login page).
+**http://localhost:8080** to check backend availability (a `401` JSON error is expected).
 
 - PostgreSQL initializes an empty database in a persistent named volume.
 - An initialization script creates the `diary_app` login with connection
@@ -325,14 +354,16 @@ Run relevant checks, review your diff for credentials, then commit and push your
 | Password authentication failed | Check the PostgreSQL login and password in the saved local file. |
 | Database does not exist | Create it first and match its name in `DB_URL`. |
 | URL must start with `jdbc`, or unresolved placeholder | Check the local file name, configuration import, and all three `DB_*` values. |
-| Login page appears | Default Spring Security is enabled. Application authentication/API rules are still to be implemented. |
-| No output after `Started DiaryBackendApplication` | Normal: the server is waiting for requests. Open the login URL. |
+| `JWT_SECRET must be set and be at least 32 characters long` | Set `JWT_SECRET` in the local file or environment to a random value of 32+ characters. |
+| `401` with "Please log in..." | The request has no token, or it is changed or expired. Log in again and send `Authorization: Bearer <token>`. |
+| Browser shows a CORS error | Set `APP_CORS_ALLOWED_ORIGIN` to the exact frontend address, including the port. |
+| No output after `Started DiaryBackendApplication` | Normal: the server is waiting for requests. |
 | No tables appear | Check Flyway startup logs, the selected database, and migration permissions. |
 
 ## Planned work
 
 - Map the migrated schema to JPA entities and repositories.
-- Implement application authentication and authorization.
+- Add role-based permissions to the case, client and diary endpoints.
 - Build legal case, client, and court diary modules.
 - Connect frontend screens to backend APIs and expand tests.
 - Add automated Docker image and Compose smoke checks to CI.
