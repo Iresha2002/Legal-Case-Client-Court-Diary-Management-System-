@@ -166,7 +166,7 @@ npm run dev
 
 Open the URL printed by Vite. It may select a different port if the default is occupied. Run `npm ci` for a fresh checkout or after lockfile changes.
 
-The frontend currently displays the project heading. Business screens and API integration are planned.
+The frontend shows the login page. It calls the backend through Vite's `/api` proxy, so start the backend first. See [How login works](#how-login-works).
 
 Press `Ctrl+C` in the relevant terminal to stop either server.
 
@@ -206,7 +206,22 @@ Users log in with their email and password and receive a signed token (JWT). The
 | --- | --- | --- | --- |
 | `JWT_SECRET` | Yes | none | Signs tokens. At least 32 characters; the backend refuses to start otherwise. |
 | `JWT_EXPIRATION_MINUTES` | No | `60` | How long a token stays valid. |
-| `APP_CORS_ALLOWED_ORIGIN` | No | `http://localhost:5173` | The frontend address allowed to call the API from a browser. |
+| `APP_CORS_ALLOWED_ORIGIN` | No | `http://localhost:5173` | The frontend address allowed to call the API directly from a browser. Not needed in development, because the Vite proxy is used. |
+
+### In the React app
+
+| File | What it does |
+| --- | --- |
+| `frontend/src/api/auth.js` | Calls login and logout, and turns errors into a message for the user. |
+| `frontend/src/auth/session.js` | Saves, reads and clears the token. Expired or broken sessions are removed. |
+| `frontend/src/pages/LoginPage.jsx` | The login form. Checks the fields, then shows the backend's message on failure. |
+| `frontend/src/pages/HomePage.jsx` | Placeholder shown after login, with **Log out**. |
+| `frontend/src/App.jsx` | Shows the login page or the signed-in page, and returns to login when the token expires. |
+
+- **Vite proxy:** the browser calls `/api/...` on the frontend's own address, and the Vite development server forwards it to `API_PROXY_TARGET` (default `http://localhost:8080`; Docker Compose sets `http://backend:8080`). The proxy removes the browser's `Origin` header, so CORS settings are not needed in development.
+- **Remember me:** when ticked, the session is kept in `localStorage` and survives closing the browser. Otherwise it is kept in `sessionStorage` and is deleted when the tab closes. The key is `lexis-diary.session`.
+- **Test users:** no users are created automatically. Add rows to `roles` and `users` in your database, with the password stored as a BCrypt hash.
+- **Later improvement:** a token in browser storage can be read by any script on the page. An httpOnly cookie would be safer but needs backend changes.
 
 ## Docker Compose
 
@@ -356,7 +371,8 @@ Run relevant checks, review your diff for credentials, then commit and push your
 | URL must start with `jdbc`, or unresolved placeholder | Check the local file name, configuration import, and all three `DB_*` values. |
 | `JWT_SECRET must be set and be at least 32 characters long` | Set `JWT_SECRET` in the local file or environment to a random value of 32+ characters. |
 | `401` with "Please log in..." | The request has no token, or it is changed or expired. Log in again and send `Authorization: Bearer <token>`. |
-| Browser shows a CORS error | Set `APP_CORS_ALLOWED_ORIGIN` to the exact frontend address, including the port. |
+| Login page says "Cannot reach the server" | Start the backend. Outside Docker, the Vite proxy expects it at `http://localhost:8080`; set `API_PROXY_TARGET` if it runs elsewhere. |
+| Browser shows a CORS error | Open the frontend address (Vite dev server), which uses the `/api` proxy. Only when calling the backend directly, set `APP_CORS_ALLOWED_ORIGIN` to the exact frontend address, including the port. |
 | No output after `Started DiaryBackendApplication` | Normal: the server is waiting for requests. |
 | No tables appear | Check Flyway startup logs, the selected database, and migration permissions. |
 
@@ -365,7 +381,7 @@ Run relevant checks, review your diff for credentials, then commit and push your
 - Map the migrated schema to JPA entities and repositories.
 - Add role-based permissions to the case, client and diary endpoints.
 - Build legal case, client, and court diary modules.
-- Connect frontend screens to backend APIs and expand tests.
+- Build the dashboard and connect the remaining frontend screens to backend APIs; expand tests.
 - Add automated Docker image and Compose smoke checks to CI.
 
 These are intended next steps, not features currently available.
