@@ -4,11 +4,21 @@ import TextField from '../components/ui/TextField.jsx';
 import PasswordField from '../components/ui/PasswordField.jsx';
 import Checkbox from '../components/ui/Checkbox.jsx';
 import scaleIcon from '../assets/icons/scale.svg';
+import loginBg from '../assets/images/login-bg.jpg';
 
 function BrandPanel() {
   return (
-    <aside className="relative hidden flex-col justify-between bg-bg-brand-image px-[72px] py-16 lg:flex">
-      <div className="flex items-center gap-4">
+    <aside
+      className="relative hidden flex-col justify-between overflow-hidden bg-bg-brand-image bg-cover bg-[position:8%_center] px-[72px] py-16 lg:flex"
+      style={{ backgroundImage: `url(${loginBg})` }}
+    >
+      {/* Darkens the photo so the white text stays readable. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/30"
+      />
+
+      <div className="relative flex items-center gap-4">
         <img src={scaleIcon} alt="" width="44" height="44" className="block shrink-0" />
         <div className="flex flex-col gap-1">
           <p className="font-serif text-logo font-semibold tracking-[0.06em] text-text-inverse">LEXIS DIARY</p>
@@ -18,7 +28,7 @@ function BrandPanel() {
         </div>
       </div>
 
-      <div className="flex max-w-[520px] flex-col gap-6">
+      <div className="relative flex max-w-[520px] flex-col gap-6">
         <h2 className="font-serif text-display font-bold text-text-inverse">
           Justice.
           <br />
