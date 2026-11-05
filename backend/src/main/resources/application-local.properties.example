@@ -5,6 +5,10 @@ DB_USERNAME=your_database_user
 DB_PASSWORD=your_database_password
 JWT_SECRET=replace_with_a_long_random_secret_at_least_32_bytes
 
+# Optional login settings (defaults shown).
+# JWT_EXPIRATION_MINUTES=60
+# APP_CORS_ALLOWED_ORIGIN=http://localhost:5173
+
 # Optional: separate schema owner login for Flyway (otherwise uses DB_USERNAME).
 # DB_MIGRATION_USERNAME=your_migration_user
 # DB_MIGRATION_PASSWORD=your_migration_password
