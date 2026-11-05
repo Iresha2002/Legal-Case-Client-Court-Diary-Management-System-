@@ -11,29 +11,12 @@
 	<groupId>com.legal</groupId>
 	<artifactId>diary-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>diary-backend</name>
+	<description>Backend for the Secure Legal Case, Client and Court Diary Management System</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-h2console</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -99,7 +82,7 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-				<!-- JJWT for JWT Authentication -->
+		<!-- JJWT for JWT Authentication -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -111,7 +94,6 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
-	
 	</dependencies>
 
 	<build>

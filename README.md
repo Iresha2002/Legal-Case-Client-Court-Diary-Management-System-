@@ -1,8 +1,8 @@
-﻿# Secure Legal Case, Client & Court Diary Management System
+# Secure Legal Case, Client & Court Diary Management System
 
 A web application being developed to organize legal cases, client records, and court diary activities in one place.
 
-**Status: initial development.** The frontend, backend, and PostgreSQL connection are initialized. Business modules, database tables, and frontend-to-backend data flows are still to be implemented. A GitHub Actions CI workflow is included.
+**Status: initial development.** The frontend, backend, and PostgreSQL connection are initialized. The initial database schema is managed by Flyway. Business modules and frontend-to-backend data flows are still to be implemented. A GitHub Actions CI workflow is included.
 
 ## Contents
 
@@ -31,12 +31,12 @@ A web application being developed to organize legal cases, client records, and c
 | Security | Spring Security | Default development login currently enabled |
 | Persistence | Spring Data JPA, Hibernate, PostgreSQL JDBC | Database access |
 | Database | PostgreSQL 18 | Relational database |
-| Migrations | Flyway | Dependency included; migrations currently disabled |
+| Migrations | Flyway | Versioned PostgreSQL schema migrations |
 | Validation | Spring Validation | Foundation for request validation |
 | Build and tests | Maven Wrapper, JUnit, Spring Boot Test | Backend build and integration checks |
 | Automation | GitHub Actions | Backend and frontend CI |
 
-Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](frontend/package.json), and the frontend lockfile. H2 dependencies are also present, but PostgreSQL is the configured application database.
+Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](frontend/package.json), and the frontend lockfile. PostgreSQL is required: set `DB_URL`, `DB_USERNAME` and `DB_PASSWORD` (Flyway applies the schema on startup). `JWT_SECRET` should be set before authentication is added.
 
 ## Project structure
 
@@ -89,7 +89,7 @@ cd Legal-Case-Client-Court-Diary-Management-System-
 
 Create an empty database using pgAdmin or PostgreSQL administration tools, for example `legal_diary`.
 
-Use a dedicated application login with a strong password. For the current connection-only setup, it needs permission to connect to the database; superuser and database-creation privileges are unnecessary. Perform administrative setup separately from the application.
+Use a dedicated application login with a strong password. The application login needs connection, schema usage, table CRUD, and sequence usage permissions. Flyway needs a schema owner login to create tables; set DB_MIGRATION_USERNAME and DB_MIGRATION_PASSWORD separately when the application login has limited permissions. If omitted, Flyway uses the application credentials. Perform administrative setup separately from the application.
 
 In pgAdmin, server **Properties → Connection** shows the host, port, and login username. Find your database name under **Databases**. The database owner and login username are not necessarily the same.
 
@@ -105,27 +105,29 @@ Open the new `application-local.properties` file and replace the example values:
 DB_URL=jdbc:postgresql://localhost:5432/legal_diary
 DB_USERNAME=your_database_user
 DB_PASSWORD=your_database_password
+JWT_SECRET=a_long_random_secret_of_at_least_32_bytes
 ```
 
 - Replace `legal_diary` with the database name you actually created.
 - Use PostgreSQL login credentials, which may differ from pgAdmin's master password.
 - Do not surround values with quotes. Save the file before starting the backend.
-- Leave `${DB_URL}`, `${DB_USERNAME}`, and `${DB_PASSWORD}` in shared configuration unchanged.
+- Generate `JWT_SECRET` yourself (for example `openssl rand -base64 48`); never reuse one from the repository history.
+- Leave `${DB_URL}`, `${DB_USERNAME}`, `${DB_PASSWORD}`, and `${JWT_SECRET}` in shared configuration unchanged.
 - Never commit the local credentials file or place passwords in shared configuration.
 
 Environment variables with the same names can supply these settings instead. A plain `.env` file is not automatically loaded by this backend configuration.
 
 ### 4. Database initialization scope
 
-The backend connects to an existing database. It does not create the database or tables:
+Create the database first. On startup, Flyway applies pending migrations from `backend/src/main/resources/db/migration/`:
 
 ```properties
-spring.jpa.hibernate.ddl-auto=none
+spring.jpa.hibernate.ddl-auto=validate
 spring.sql.init.mode=never
-spring.flyway.enabled=false
+spring.flyway.enabled=true
 ```
 
-Hibernate schema changes, SQL initialization scripts, and Flyway migrations are disabled. Flyway's history table is not created either. Use versioned migrations when schema development begins.
+Flyway V1 creates the 10 ER tables and its own `flyway_schema_history` table. Hibernate validates the schema without modifying it; SQL initialization scripts remain disabled. Never edit an applied migration: add V2, V3, and so on. Existing non-empty databases are not automatically baselined; review them before migration.
 
 ## Running the application
 
@@ -188,8 +190,8 @@ From the repository root, create the Compose settings file once:
 Copy-Item .env.example .env
 ```
 
-Open `.env`, replace both password examples with different strong passwords, and
-save it. This file is ignored by Git. For passwords containing `$` or `#`, use
+Open `.env`, replace both password examples with different strong passwords, set
+`COMPOSE_JWT_SECRET` to a long random value, and save it. This file is ignored by Git. For passwords containing `$` or `#`, use
 single quotes around the entire value in `.env` to preserve it literally.
 These Compose settings are independent of `application-local.properties`.
 The backend local credentials file is excluded from its Docker build context.
@@ -204,13 +206,14 @@ docker compose ps
 ```
 
 With the default ports, open **http://localhost:5173** for the frontend and
-**http://localhost:8080/login** to check backend availability.
+**http://localhost:8080/login** to check backend availability (the default Spring Security
+login page).
 
 - PostgreSQL initializes an empty database in a persistent named volume.
 - An initialization script creates the `diary_app` login with connection
-  permission, separate from the administrator. It creates no application tables.
+  and data access permissions, separate from the administrator. Flyway uses the administrator login to apply migrations; the application continues using `diary_app`.
 - Backend startup waits for PostgreSQL health; frontend startup waits for the
-  backend login endpoint to respond.
+  backend port to accept connections.
 - PostgreSQL has no published host port. Backend connects using the Compose
   service hostname `postgres`; your host PostgreSQL can continue using port 5432.
 - Application ports are bound to the local machine only.
@@ -235,6 +238,21 @@ only when intentionally discarding this Docker database.
 
 This is a local development setup. Production deployment requires a separate
 review of authentication, secrets, TLS, backups, and frontend serving.
+
+### Existing Docker database volumes
+
+The permissions initialization script runs automatically only for new volumes.
+For a volume created before Flyway was enabled, start PostgreSQL and apply the
+permissions once before rebuilding the backend (replace `legal_diary` if needed):
+
+```powershell
+docker compose up -d postgres
+Get-Content docker/postgres/02-app-permissions.sql | docker compose exec -T postgres psql -U diary_admin -d legal_diary -v ON_ERROR_STOP=1
+docker compose up --build -d --wait
+```
+
+This grants data access without granting schema creation to `diary_app` and
+retains existing data. Flyway uses `diary_admin` to own and migrate the schema.
 
 ## Build and checks
 
@@ -278,7 +296,7 @@ The [CI workflow](.github/workflows/ci.yml) runs:
 | Backend build and tests | Java 21, Maven Wrapper `clean verify`, PostgreSQL 18 service |
 | Frontend lint and build | Node.js 24, `npm ci`, ESLint, Vite production build |
 
-Jobs run independently. Backend CI uses a fresh PostgreSQL service with disposable credentials; local passwords and repository secrets are unnecessary. Schema initialization remains disabled.
+Jobs run independently. Backend CI uses a fresh PostgreSQL service with disposable credentials; local passwords and repository secrets are unnecessary. Flyway applies and tests the initial schema in the temporary CI database.
 
 The workflow includes dependency caching, timeouts, read-only repository permissions, and cancellation of superseded runs on the same ref. Check both results under **GitHub → Actions** before merging.
 
@@ -309,11 +327,11 @@ Run relevant checks, review your diff for credentials, then commit and push your
 | URL must start with `jdbc`, or unresolved placeholder | Check the local file name, configuration import, and all three `DB_*` values. |
 | Login page appears | Default Spring Security is enabled. Application authentication/API rules are still to be implemented. |
 | No output after `Started DiaryBackendApplication` | Normal: the server is waiting for requests. Open the login URL. |
-| No tables appear | Expected: automatic schema creation and migrations are disabled. |
+| No tables appear | Check Flyway startup logs, the selected database, and migration permissions. |
 
 ## Planned work
 
-- Define the database schema and introduce Flyway migrations.
+- Map the migrated schema to JPA entities and repositories.
 - Implement application authentication and authorization.
 - Build legal case, client, and court diary modules.
 - Connect frontend screens to backend APIs and expand tests.
