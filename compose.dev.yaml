@@ -1,0 +1,32 @@
+# Development override: mounts the source folders so edits reload automatically.
+# Usage:
+#   docker compose -f compose.yaml -f compose.dev.yaml up --build -d --wait
+# Frontend: Vite hot-reloads the browser on save.
+# Backend: files under backend/src/main are recompiled on save and Spring Boot
+# DevTools restarts the app (a few seconds).
+
+services:
+  backend:
+    build: !reset null
+    image: eclipse-temurin:21-jdk-alpine
+    working_dir: /workspace
+    command: ['sh', '/dev-watch.sh']
+    volumes:
+      - ./backend:/workspace
+      - ./docker/backend/dev-watch.sh:/dev-watch.sh:ro
+      # Keep build output and the Maven cache inside Docker, away from your local target/ folder.
+      - backend_target:/workspace/target
+      - maven_cache:/root/.m2
+    healthcheck:
+      # The first start downloads Maven dependencies, so allow extra time.
+      start_period: 300s
+
+  frontend:
+    volumes:
+      - ./frontend:/app
+      # Keep the container's installed node_modules instead of the host's.
+      - /app/node_modules
+
+volumes:
+  backend_target:
+  maven_cache:
