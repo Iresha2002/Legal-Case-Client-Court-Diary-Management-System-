@@ -29,4 +29,11 @@ public enum AppRole {
                 .filter(role -> role.roleName.equals(roleName))
                 .findFirst();
     }
+
+    /** Finds the role for an authority stored in a token, for example "ROLE_CLERK". */
+    public static Optional<AppRole> fromAuthority(String authority) {
+        return Arrays.stream(values())
+                .filter(role -> role.authority().equals(authority))
+                .findFirst();
+    }
 }

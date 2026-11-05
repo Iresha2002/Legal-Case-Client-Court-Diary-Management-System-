@@ -1,11 +1,14 @@
 package com.legal.diary_backend.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,26 @@ public class JwtService {
                 .signWith(signingKey)
                 .compact();
         return new IssuedToken(token, expiresAt);
+    }
+
+    /**
+     * Checks the signature and expiry of a token and reads the user from it.
+     * Returns empty for any token that is broken, changed, expired or has an unknown role.
+     */
+    public Optional<AuthenticatedUser> readToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(signingKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            Long userId = Long.valueOf(claims.getSubject());
+            return AppRole.fromAuthority(claims.get("role", String.class))
+                    .map(role -> new AuthenticatedUser(userId, role));
+        } catch (JwtException | IllegalArgumentException exception) {
+            // JwtException covers a bad signature, a broken token and an expired token.
+            return Optional.empty();
+        }
     }
 
     public record IssuedToken(String token, Instant expiresAt) {
