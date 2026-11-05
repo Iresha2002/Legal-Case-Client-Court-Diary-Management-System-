@@ -44,6 +44,9 @@ services:
   frontend:
     build:
       context: ./frontend
+    environment:
+      # Vite forwards /api calls to the backend container (see frontend/vite.config.js).
+      API_PROXY_TARGET: http://backend:8080
     ports:
       - '127.0.0.1:${COMPOSE_FRONTEND_PORT:-5173}:5173'
     depends_on:
