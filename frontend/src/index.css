@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Design tokens from the LEXIS DIARY Figma file (variables + text/effect styles). */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+
+  --color-bg-page: #f7f7f7;
+  --color-bg-surface: #ffffff;
+  --color-bg-sidebar: #0a0a0a;
+  --color-bg-brand-image: #1a1a1a;
+
+  --color-text-primary: #171717;
+  --color-text-secondary: #737373;
+  --color-text-inverse: #ffffff;
+  --color-text-sidebar: #d4d4d4;
+
+  --color-border-default: #e5e5e5;
+  --color-border-strong: #0a0a0a;
+
+  --color-action-primary: #0a0a0a;
+  --color-action-primary-text: #ffffff;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+
+  --shadow-raised: 0 8px 24px 0 rgb(0 0 0 / 0.12);
+
+  /* Typography styles: font-size / line-height pairs */
+  --text-display: 44px;
+  --text-display--line-height: 52px;
+  --text-logo: 20px;
+  --text-logo--line-height: 24px;
+  --text-body: 14px;
+  --text-body--line-height: 22px;
+  --text-caption: 12px;
+  --text-caption--line-height: 18px;
+  --text-label: 11px;
+  --text-label--line-height: 16px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-page);
+    -webkit-font-smoothing: antialiased;
+  }
+}
