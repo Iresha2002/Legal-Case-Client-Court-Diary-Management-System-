@@ -12,6 +12,7 @@ A web application being developed to organize legal cases, client records, and c
 - [Getting started](#getting-started)
 - [Running the application](#running-the-application)
 - [How login works](#how-login-works)
+- [Test users for development](#test-users-for-development)
 - [Docker Compose](#docker-compose)
 - [Build and checks](#build-and-checks)
 - [Continuous integration](#continuous-integration)
@@ -49,7 +50,11 @@ Exact dependencies are recorded in [pom.xml](backend/pom.xml), [package.json](fr
 |   |-- src/main/java/                  # Backend source
 |   |-- src/main/resources/
 |   |   |-- application.properties      # Shared configuration
-|   |   `-- application-local.properties.example
+|   |   |-- application-dev.properties  # Only with the "dev" profile: adds the test users
+|   |   |-- application-local.properties.example
+|   |   `-- db/
+|   |       |-- migration/              # Flyway migrations (every environment)
+|   |       `-- dev-seed/               # Test roles and users (development only)
 |   |-- src/test/java/                  # Backend tests
 |   |-- mvnw                            # Unix wrapper
 |   |-- mvnw.cmd                        # Windows wrapper
@@ -141,8 +146,10 @@ From the repository root:
 
 ```powershell
 cd backend
-.\mvnw.cmd spring-boot:run
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```
+
+The `dev` profile adds the shared test users (see [Test users for development](#test-users-for-development)). Leave it out to start without them.
 
 Wait for `Started DiaryBackendApplication`. The terminal stays occupied while the server handles requests; this is normal.
 
@@ -220,8 +227,24 @@ Users log in with their email and password and receive a signed token (JWT). The
 
 - **Vite proxy:** the browser calls `/api/...` on the frontend's own address, and the Vite development server forwards it to `API_PROXY_TARGET` (default `http://localhost:8080`; Docker Compose sets `http://backend:8080`). The proxy removes the browser's `Origin` header, so CORS settings are not needed in development.
 - **Remember me:** when ticked, the session is kept in `localStorage` and survives closing the browser. Otherwise it is kept in `sessionStorage` and is deleted when the tab closes. The key is `lexis-diary.session`.
-- **Test users:** no users are created automatically. Add rows to `roles` and `users` in your database, with the password stored as a BCrypt hash.
+- **Test users:** with the `dev` profile, test accounts are created for you. See [Test users for development](#test-users-for-development).
 - **Later improvement:** a token in browser storage can be read by any script on the page. An httpOnly cookie would be safer but needs backend changes.
+
+## Test users for development
+
+Each teammate has their own database, and the rows in it are not shared through Git. So that everyone can log in, the `dev` profile adds the same test accounts to every development database.
+
+| Email | Password | Role |
+| --- | --- | --- |
+| `senior@lexis.test` | `DevPass123!` | Senior Lawyer |
+| `junior@lexis.test` | `DevPass123!` | Junior Lawyer |
+| `clerk@lexis.test` | `DevPass123!` | Clerk |
+
+- **How it works:** `application-dev.properties` adds `db/dev-seed/` to the Flyway locations. That folder holds `R__dev_seed_users.sql`, a repeatable migration that inserts the three roles and the three users. Without the `dev` profile, Flyway never reads it.
+- **Turning it on:** the Docker dev setup (`compose.dev.yaml`) sets `SPRING_PROFILES_ACTIVE=dev`. Outside Docker, run the backend with `"-Dspring-boot.run.profiles=dev"`.
+- **Safe to repeat:** rows that already exist are skipped, so your own users and roles are never changed. When the file is edited, Flyway runs it again on the next start.
+- **Never in production:** these passwords are public in the repository. Do not activate the `dev` profile on a real server.
+- **Adding a test user:** add a line to the `VALUES` list in `R__dev_seed_users.sql`. Store a BCrypt hash, never a plain password.
 
 ## Docker Compose
 
@@ -374,6 +397,7 @@ Run relevant checks, review your diff for credentials, then commit and push your
 | Login page says "Cannot reach the server" | Start the backend. Outside Docker, the Vite proxy expects it at `http://localhost:8080`; set `API_PROXY_TARGET` if it runs elsewhere. |
 | Browser shows a CORS error | Open the frontend address (Vite dev server), which uses the `/api` proxy. Only when calling the backend directly, set `APP_CORS_ALLOWED_ORIGIN` to the exact frontend address, including the port. |
 | No output after `Started DiaryBackendApplication` | Normal: the server is waiting for requests. |
+| Test users cannot log in | Check that the backend was started with the `dev` profile and that the log shows Flyway running `dev seed users`. |
 | No tables appear | Check Flyway startup logs, the selected database, and migration permissions. |
 
 ## Planned work

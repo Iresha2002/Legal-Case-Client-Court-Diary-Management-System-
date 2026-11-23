@@ -11,6 +11,9 @@ services:
     image: eclipse-temurin:21-jdk-alpine
     working_dir: /workspace
     command: ['sh', '/dev-watch.sh']
+    environment:
+      # Turns on application-dev.properties, which adds the test users in db/dev-seed.
+      SPRING_PROFILES_ACTIVE: dev
     volumes:
       - ./backend:/workspace
       - ./docker/backend/dev-watch.sh:/dev-watch.sh:ro
