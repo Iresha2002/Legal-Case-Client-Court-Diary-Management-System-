@@ -3,8 +3,7 @@ import { CalendarDays, Eye } from 'lucide-react';
 import Badge from '../../../../components/ui/Badge.jsx';
 import Card from '../../../../components/ui/Card.jsx';
 import { formatDate } from '../../../../utils/format.js';
-
-const STATUS_VARIANTS = { Ongoing: 'dark', Pending: 'muted', Closed: 'outline' };
+import { STATUS_VARIANTS } from '../../cases/caseOptions.js';
 
 const headerCell = 'px-4 py-3.5 text-left text-label font-semibold tracking-[0.06em] text-text-secondary';
 const cell = 'px-4 py-3.5 text-body text-text-primary';
