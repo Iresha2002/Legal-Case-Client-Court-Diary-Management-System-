@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
-import { Activity, BriefcaseBusiness, Check, Clock, Eye, Lock } from 'lucide-react';
+import { Link, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import { Activity, BriefcaseBusiness, Check, Clock, Eye, Hourglass, Lock } from 'lucide-react';
 import ActionMenu from '../../../components/ui/ActionMenu.jsx';
 import Badge from '../../../components/ui/Badge.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import Pagination from '../../../components/ui/Pagination.jsx';
 import StatCard from '../../../components/ui/StatCard.jsx';
+import { useAccessRequests } from '../../../state/accessRequestsContext.js';
 import { CASE_TYPES, STATUS_VARIANTS } from './caseOptions.js';
+import RequestAccessDialog from './RequestAccessDialog.jsx';
 
 const PAGE_SIZE = 8;
 
@@ -18,13 +20,28 @@ function countByStatus(list, status) {
 
 // Figma "JL 03 Cases" and "JL 03.20 - 03.24 Cases - Filtered by Type".
 // All cases are listed, but only the ones assigned to the user can be opened;
-// the others show as Restricted with a "Request Access" action.
+// the others show as Restricted with a "Request Access" action (Figma 03.5 / 03.6).
 // ?type=civil shows only the user's cases of that type.
 export default function CasesPage() {
   const { cases: allCases } = useOutletContext();
+  const { sendRequest, pendingRequestFor } = useAccessRequests();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);
+  const [requestingCase, setRequestingCase] = useState(null); // case shown in the Request Access dialog
+  const [sentRequest, setSentRequest] = useState(null); // last request sent, shown in the banner
+
+  const handleSendRequest = (values) => {
+    sendRequest(values);
+    setSentRequest(values);
+    setRequestingCase(null);
+  };
+
+  // Restricted cases: "Request Access", or "View Request" when a request is already waiting.
+  const restrictedActions = (item) =>
+    pendingRequestFor(item.id)
+      ? [{ label: 'View Request', icon: Hourglass, onSelect: () => navigate('/access-requests?tab=mine') }]
+      : [{ label: 'Request Access', icon: Lock, onSelect: () => setRequestingCase(item) }];
 
   const typeKey = searchParams.get('type');
   const typeLabel = CASE_TYPES[typeKey]; // undefined when there is no (valid) filter
@@ -56,6 +73,25 @@ export default function CasesPage() {
           + Add New Case
         </Button>
       </div>
+
+      {sentRequest && (
+        <div
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-default bg-bg-surface px-4 py-3"
+        >
+          <p className="flex items-center gap-3 text-body text-text-primary">
+            <Check size={16} className="shrink-0" aria-hidden="true" />
+            <span>
+              Access request sent to {sentRequest.assignedTo} for {sentRequest.caseId}. You can follow it under{' '}
+              <Link to="/access-requests?tab=mine" className="font-medium underline">
+                Access Requests
+              </Link>
+              .
+            </span>
+          </p>
+          <Badge>Pending</Badge>
+        </div>
+      )}
 
       {typeLabel && (
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-md border border-border-default bg-bg-surface px-4 py-3">
@@ -123,14 +159,7 @@ export default function CasesPage() {
                         items={
                           open
                             ? [{ label: 'View Case', icon: Eye, onSelect: () => navigate(`/cases/${item.id}`) }]
-                            : [
-                                {
-                                  label: 'Request Access',
-                                  icon: Lock,
-                                  // The request form (Figma 03.5) comes with the Access Requests screens.
-                                  onSelect: () => navigate('/access-requests'),
-                                },
-                              ]
+                            : restrictedActions(item)
                         }
                       />
                     </td>
@@ -153,6 +182,14 @@ export default function CasesPage() {
           <Pagination page={currentPage} pageCount={pageCount} onChange={setPage} />
         </div>
       </div>
+
+      {requestingCase && (
+        <RequestAccessDialog
+          caseItem={requestingCase}
+          onSend={handleSendRequest}
+          onClose={() => setRequestingCase(null)}
+        />
+      )}
     </div>
   );
 }
