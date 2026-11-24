@@ -16,7 +16,7 @@ export const caseDetails = {
       {
         id: 2,
         date: '2026-09-09',
-        time: '',
+        time: '10:00',
         courtRoom: 'Court Room 03',
         judge: 'Hon. Justice Perera',
         status: 'Completed',
@@ -74,9 +74,72 @@ export const caseDetails = {
     hearings: [
       {
         id: 1,
-        date: '2026-07-20',
-        time: '10:00',
+        date: '2026-08-14',
+        time: '09:30',
         courtRoom: 'Court Room 01',
+        judge: 'Hon. Justice Mendis',
+        status: 'Completed',
+        summary: 'Survey report requested from the Surveyor General.',
+      },
+      {
+        id: 2,
+        date: '2026-09-22',
+        time: '14:00',
+        courtRoom: 'Court Room 01',
+        judge: 'Hon. Justice Mendis',
+        status: 'Upcoming',
+        summary: '',
+      },
+    ],
+    notes: [],
+    documents: [],
+  },
+  'LC-2026-0038': {
+    hearings: [
+      {
+        id: 1,
+        date: '2026-09-03',
+        time: '09:00',
+        courtRoom: 'Court Room 05',
+        judge: 'Hon. Justice Fernando',
+        status: 'Completed',
+        summary: 'Charges were read out. The accused pleaded not guilty.',
+      },
+    ],
+    notes: [],
+    documents: [],
+  },
+  'LC-2026-0030': {
+    hearings: [
+      {
+        id: 1,
+        date: '2026-09-04',
+        time: '09:30',
+        courtRoom: 'Court Room 02',
+        judge: 'Hon. Justice Mendis',
+        status: 'Completed',
+        summary: 'Maintenance claim filed. The respondent was asked to file objections.',
+      },
+      {
+        id: 2,
+        date: '2026-09-15',
+        time: '10:00',
+        courtRoom: 'Court Room 02',
+        judge: 'Hon. Justice Mendis',
+        status: 'Completed',
+        summary: 'Objections filed by the respondent. The matter was fixed for inquiry.',
+      },
+    ],
+    notes: [],
+    documents: [],
+  },
+  'LC-2026-0036': {
+    hearings: [
+      {
+        id: 1,
+        date: '2026-09-29',
+        time: '11:00',
+        courtRoom: 'Court Room 04',
         judge: 'Hon. Justice Silva',
         status: 'Upcoming',
         summary: '',
