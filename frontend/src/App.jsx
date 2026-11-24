@@ -9,7 +9,10 @@ import ClientsPage from './pages/jl/clients/ClientsPage.jsx';
 import AddClientPage from './pages/jl/clients/AddClientPage.jsx';
 import ClientDetailsPage from './pages/jl/clients/ClientDetailsPage.jsx';
 import EditClientPage from './pages/jl/clients/EditClientPage.jsx';
+import CasesLayout from './pages/jl/cases/CasesLayout.jsx';
 import CasesPage from './pages/jl/cases/CasesPage.jsx';
+import AddCasePage from './pages/jl/cases/AddCasePage.jsx';
+import EditCasePage from './pages/jl/cases/EditCasePage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -41,9 +44,12 @@ function App() {
           <Route path=":clientId" element={<ClientDetailsPage />} />
           <Route path=":clientId/edit" element={<EditClientPage />} />
         </Route>
-        <Route path="cases" element={<CasesPage />} />
-        <Route path="cases/new" element={<ComingSoonPage title="Add New Case" />} />
-        <Route path="cases/:caseId" element={<ComingSoonPage title="Case Details" />} />
+        <Route path="cases" element={<CasesLayout />}>
+          <Route index element={<CasesPage />} />
+          <Route path="new" element={<AddCasePage />} />
+          <Route path=":caseId" element={<ComingSoonPage title="Case Details" />} />
+          <Route path=":caseId/edit" element={<EditCasePage />} />
+        </Route>
         <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />
         <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
         <Route path="access-requests" element={<ComingSoonPage title="Access Requests" />} />
