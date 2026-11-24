@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { Activity, BriefcaseBusiness, Check, Clock, Eye, Lock } from 'lucide-react';
 import ActionMenu from '../../../components/ui/ActionMenu.jsx';
 import Badge from '../../../components/ui/Badge.jsx';
 import Button from '../../../components/ui/Button.jsx';
 import Pagination from '../../../components/ui/Pagination.jsx';
 import StatCard from '../../../components/ui/StatCard.jsx';
-import { cases as allCases } from '../../../mocks/mockCases.js';
 import { CASE_TYPES, STATUS_VARIANTS } from './caseOptions.js';
 
 const PAGE_SIZE = 8;
@@ -22,6 +21,7 @@ function countByStatus(list, status) {
 // the others show as Restricted with a "Request Access" action.
 // ?type=civil shows only the user's cases of that type.
 export default function CasesPage() {
+  const { cases: allCases } = useOutletContext();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);

@@ -1,4 +1,5 @@
-// Case types and statuses shared by the Cases screens.
+// Case types, statuses and other choices shared by the Cases screens.
+// Lawyers and priorities are not listed in Figma beyond the examples, so the team should confirm them.
 
 // URL key -> label, e.g. /cases?type=civil
 export const CASE_TYPES = {
@@ -10,6 +11,14 @@ export const CASE_TYPES = {
   commercial: 'Commercial',
   labour: 'Labour',
 };
+
+export const CASE_STATUSES = ['Ongoing', 'Pending', 'Closed'];
+
+export const PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
+
+// Sample lawyers until the users API exists. The first one is the logged-in lawyer in the sample data.
+export const CURRENT_LAWYER = 'Mihiri Weerasekara';
+export const LAWYERS = [CURRENT_LAWYER, 'Hasini Thennakoon', 'Ruwan Jayasinghe'];
 
 // Badge style for each case status.
 export const STATUS_VARIANTS = {
