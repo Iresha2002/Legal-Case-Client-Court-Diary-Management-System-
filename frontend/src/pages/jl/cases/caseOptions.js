@@ -20,6 +20,10 @@ export const PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
 export const CURRENT_LAWYER = 'Mihiri Weerasekara';
 export const LAWYERS = [CURRENT_LAWYER, 'Hasini Thennakoon', 'Ruwan Jayasinghe'];
 
+// Case Details choices. Figma shows only some of them as examples, so the team should confirm these lists.
+export const NOTE_TAGS = ['Meeting', 'Research', 'Hearing', 'Call', 'Other'];
+export const DOCUMENT_TYPES = ['Pleading', 'Affidavit', 'Evidence', 'Agreement', 'Correspondence', 'Court Order', 'Other'];
+
 // Badge style for each case status.
 export const STATUS_VARIANTS = {
   Ongoing: 'dark',
