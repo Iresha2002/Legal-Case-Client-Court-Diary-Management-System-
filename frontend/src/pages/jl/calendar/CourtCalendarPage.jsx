@@ -24,7 +24,7 @@ const VIEW_LABELS = { month: 'Month', week: 'Week', day: 'Day' };
 const SUBTITLE_SUFFIX = 'Your cases only';
 
 const arrowButton =
-  'flex size-11 items-center justify-center rounded-sm border border-border-strong bg-bg-surface text-text-primary hover:bg-neutral-100';
+  'flex size-11 items-center justify-center rounded-sm border border-border-strong bg-bg-surface text-text-primary hover:bg-bg-page';
 
 // Figma "JL 04 Court Calendar": hearings of the user's cases in Month, Week or Day view.
 // The view and date are kept in the URL (?view=week&date=2026-09-15), so a reload keeps them.

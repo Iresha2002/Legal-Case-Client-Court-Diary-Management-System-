@@ -39,6 +39,31 @@
   --text-label--line-height: 16px;
 }
 
+/* Dark theme (Settings > Preferences > Appearance). src/theme.js sets data-theme on <html>.
+   Figma has no dark screens, so these colours keep the same black-and-white style with the
+   light and dark swapped: primary buttons and badges become light with dark text.
+   The sidebar stays dark in both themes. */
+:root[data-theme='dark'] {
+  color-scheme: dark; /* dark date pickers, scrollbars and other browser controls */
+
+  --color-bg-page: #121212;
+  --color-bg-surface: #1c1c1c;
+  --color-bg-sidebar: #0a0a0a;
+
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #a3a3a3;
+  --color-text-inverse: #0a0a0a;
+  --color-text-sidebar: #d4d4d4;
+
+  --color-border-default: #2e2e2e;
+  --color-border-strong: #f5f5f5;
+
+  --color-action-primary: #f5f5f5;
+  --color-action-primary-text: #0a0a0a;
+
+  --shadow-raised: 0 8px 24px 0 rgb(0 0 0 / 0.5);
+}
+
 @layer base {
   html {
     font-family: var(--font-sans);

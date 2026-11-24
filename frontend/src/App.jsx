@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage.jsx';
 import AppLayout from './layouts/AppLayout.jsx';
 import DashboardPage from './pages/jl/DashboardPage.jsx';
-import ComingSoonPage from './pages/jl/ComingSoonPage.jsx';
 import ClientsLayout from './pages/jl/clients/ClientsLayout.jsx';
 import ClientsPage from './pages/jl/clients/ClientsPage.jsx';
 import AddClientPage from './pages/jl/clients/AddClientPage.jsx';
@@ -21,6 +20,7 @@ import RemindersPage from './pages/jl/reminders/RemindersPage.jsx';
 import AddReminderPage from './pages/jl/reminders/AddReminderPage.jsx';
 import EditReminderPage from './pages/jl/reminders/EditReminderPage.jsx';
 import ActivityHistoryPage from './pages/jl/activity/ActivityHistoryPage.jsx';
+import SettingsPage from './pages/jl/settings/SettingsPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -66,7 +66,7 @@ function App() {
         </Route>
         <Route path="access-requests" element={<AccessRequestsPage />} />
         <Route path="activity" element={<ActivityHistoryPage />} />
-        <Route path="settings" element={<ComingSoonPage title="Settings" />} />
+        <Route path="settings" element={<SettingsPage />} />
         {/* Unknown URLs go back to the dashboard. */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>

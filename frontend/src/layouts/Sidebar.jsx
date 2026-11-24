@@ -21,7 +21,8 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 px-3">
           <img src={scaleIcon} alt="" width="32" height="32" />
           <div>
-            <p className="font-serif text-logo font-semibold tracking-[0.06em] text-text-inverse">LEXIS DIARY</p>
+            {/* text-white, not text-inverse: the sidebar is dark in both themes. */}
+            <p className="font-serif text-logo font-semibold tracking-[0.06em] text-white">LEXIS DIARY</p>
             <p className="text-caption text-text-sidebar">Secure Legal Case &amp; Court Diary Management System</p>
           </div>
         </div>
@@ -33,7 +34,7 @@ export default function Sidebar() {
               to={to}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-sm px-3 py-3 text-body ${
-                  isActive ? 'bg-neutral-800 text-text-inverse' : 'text-text-sidebar hover:bg-neutral-900'
+                  isActive ? 'bg-neutral-800 text-white' : 'text-text-sidebar hover:bg-neutral-900'
                 }`
               }
             >

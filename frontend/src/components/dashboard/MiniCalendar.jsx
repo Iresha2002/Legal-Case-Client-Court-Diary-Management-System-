@@ -74,7 +74,7 @@ export default function MiniCalendar({ markedDates = [] }) {
                     ? 'bg-action-primary font-semibold text-text-inverse'
                     : inMonth
                       ? 'text-text-primary'
-                      : 'text-neutral-400'
+                      : 'text-text-secondary opacity-70'
                 }`}
               >
                 {day.getDate()}

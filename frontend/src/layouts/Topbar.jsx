@@ -75,8 +75,8 @@ function ProfileMenu({ session, onLogout }) {
           role="menu"
           className="absolute right-0 z-20 mt-2 w-[220px] rounded-md border border-border-default bg-bg-surface p-2 shadow-raised"
         >
-          {/* Both go to Settings until the separate Account screen is built (Figma "JL 08"). */}
-          <button type="button" role="menuitem" className={menuItemClass} onClick={() => goTo('/settings')}>
+          {/* Figma has no separate account screen: My Account opens the Account tab of Settings. */}
+          <button type="button" role="menuitem" className={menuItemClass} onClick={() => goTo('/settings?tab=account')}>
             <UserRound size={18} />
             My Account
           </button>

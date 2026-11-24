@@ -1,5 +1,6 @@
-import checkIcon from '../../assets/icons/check.svg';
+import { Check } from 'lucide-react';
 
+// The tick uses the theme's inverse text colour, so it shows on the filled box in light and dark mode.
 export default function Checkbox({ label, checked, onChange, ...props }) {
   return (
     <label className="flex cursor-pointer items-center gap-2 text-body text-text-primary">
@@ -16,7 +17,7 @@ export default function Checkbox({ label, checked, onChange, ...props }) {
           checked ? 'bg-action-primary' : 'bg-bg-surface'
         }`}
       >
-        {checked && <img src={checkIcon} alt="" width="14" height="14" className="block" />}
+        {checked && <Check size={14} strokeWidth={2.5} className="block text-text-inverse" />}
       </span>
       {label}
     </label>
