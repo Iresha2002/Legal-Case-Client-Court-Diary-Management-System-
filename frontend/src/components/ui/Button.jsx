@@ -1,7 +1,7 @@
 // Figma "Button": Primary = solid black (one per page). Secondary = white with black outline.
 const variants = {
-  primary: 'bg-action-primary text-action-primary-text border-action-primary hover:bg-neutral-800',
-  secondary: 'bg-bg-surface text-text-primary border-border-strong hover:bg-neutral-100',
+  primary: 'bg-action-primary text-action-primary-text border-action-primary hover:bg-action-primary/85',
+  secondary: 'bg-bg-surface text-text-primary border-border-strong hover:bg-bg-page',
 };
 
 // fullWidth={false} makes the button only as wide as its text (e.g. "Save Client", "+ Add Client").
