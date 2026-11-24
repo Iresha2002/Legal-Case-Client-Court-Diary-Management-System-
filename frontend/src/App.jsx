@@ -4,6 +4,9 @@ import LoginPage from './pages/LoginPage.jsx';
 import AppLayout from './layouts/AppLayout.jsx';
 import DashboardPage from './pages/jl/DashboardPage.jsx';
 import ComingSoonPage from './pages/jl/ComingSoonPage.jsx';
+import ClientsLayout from './pages/jl/clients/ClientsLayout.jsx';
+import ClientsPage from './pages/jl/clients/ClientsPage.jsx';
+import AddClientPage from './pages/jl/clients/AddClientPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -29,7 +32,12 @@ function App() {
       <Route element={<AppLayout session={session} onLogout={() => setSession(null)} />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="clients" element={<ComingSoonPage title="Clients" />} />
+        <Route path="clients" element={<ClientsLayout />}>
+          <Route index element={<ClientsPage />} />
+          <Route path="new" element={<AddClientPage />} />
+          <Route path=":clientId" element={<ComingSoonPage title="Client Details" />} />
+          <Route path=":clientId/edit" element={<ComingSoonPage title="Edit Client" />} />
+        </Route>
         <Route path="cases" element={<ComingSoonPage title="Cases" />} />
         <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />
         <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
