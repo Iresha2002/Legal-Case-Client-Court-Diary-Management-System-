@@ -13,6 +13,7 @@ import CasesLayout from './pages/jl/cases/CasesLayout.jsx';
 import CasesPage from './pages/jl/cases/CasesPage.jsx';
 import AddCasePage from './pages/jl/cases/AddCasePage.jsx';
 import EditCasePage from './pages/jl/cases/EditCasePage.jsx';
+import CaseDetailsPage from './pages/jl/cases/CaseDetailsPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -47,7 +48,7 @@ function App() {
         <Route path="cases" element={<CasesLayout />}>
           <Route index element={<CasesPage />} />
           <Route path="new" element={<AddCasePage />} />
-          <Route path=":caseId" element={<ComingSoonPage title="Case Details" />} />
+          <Route path=":caseId" element={<CaseDetailsPage />} />
           <Route path=":caseId/edit" element={<EditCasePage />} />
         </Route>
         <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />

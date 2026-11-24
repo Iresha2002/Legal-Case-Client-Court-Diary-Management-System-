@@ -6,7 +6,8 @@ import { MoreVertical } from 'lucide-react';
 //
 // The menu uses fixed positioning under the button, so it is not cut off
 // by tables that scroll sideways. It closes on outside click, Escape, scroll or resize.
-export default function ActionMenu({ label, items }) {
+// bordered={false} drops the button border (Figma diary note menu).
+export default function ActionMenu({ label, items, bordered = true }) {
   const [position, setPosition] = useState(null); // null = closed
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
@@ -53,7 +54,9 @@ export default function ActionMenu({ label, items }) {
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={Boolean(position)}
-        className="flex size-8 items-center justify-center rounded-sm border border-border-default bg-bg-surface text-text-primary hover:bg-bg-page"
+        className={`flex size-8 shrink-0 items-center justify-center rounded-sm text-text-primary hover:bg-bg-page ${
+          bordered ? 'border border-border-default bg-bg-surface' : ''
+        }`}
       >
         <MoreVertical size={16} />
       </button>

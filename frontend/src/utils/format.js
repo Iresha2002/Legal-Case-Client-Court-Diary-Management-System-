@@ -35,3 +35,23 @@ export function formatDate(value, { short = false } = {}) {
   const monthName = short ? MONTHS[month - 1].slice(0, 3) : MONTHS[month - 1];
   return `${String(day).padStart(2, '0')} ${monthName} ${year}`;
 }
+
+// A Date to the date input format: today -> "2026-11-24".
+export function toDateValue(date = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// Time input value (24-hour "HH:MM") to display text: "09:00" -> "09:00 AM", "14:30" -> "02:30 PM".
+export function formatTime(value) {
+  if (!value) return '';
+  const [hours, minutes] = value.split(':').map(Number);
+  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+  return `${String(hour12).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
+}
+
+// File size in bytes to display text: 250880 -> "245 KB", 1468006 -> "1.4 MB".
+export function formatFileSize(bytes) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
