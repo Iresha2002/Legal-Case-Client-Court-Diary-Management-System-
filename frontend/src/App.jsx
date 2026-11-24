@@ -16,6 +16,10 @@ import EditCasePage from './pages/jl/cases/EditCasePage.jsx';
 import CaseDetailsPage from './pages/jl/cases/CaseDetailsPage.jsx';
 import AccessRequestsPage from './pages/jl/AccessRequestsPage.jsx';
 import CourtCalendarPage from './pages/jl/calendar/CourtCalendarPage.jsx';
+import RemindersLayout from './pages/jl/reminders/RemindersLayout.jsx';
+import RemindersPage from './pages/jl/reminders/RemindersPage.jsx';
+import AddReminderPage from './pages/jl/reminders/AddReminderPage.jsx';
+import EditReminderPage from './pages/jl/reminders/EditReminderPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -54,7 +58,11 @@ function App() {
           <Route path=":caseId/edit" element={<EditCasePage />} />
         </Route>
         <Route path="calendar" element={<CourtCalendarPage />} />
-        <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
+        <Route path="reminders" element={<RemindersLayout />}>
+          <Route index element={<RemindersPage />} />
+          <Route path="new" element={<AddReminderPage />} />
+          <Route path=":reminderId/edit" element={<EditReminderPage />} />
+        </Route>
         <Route path="access-requests" element={<AccessRequestsPage />} />
         <Route path="activity" element={<ComingSoonPage title="Activity History" />} />
         <Route path="settings" element={<ComingSoonPage title="Settings" />} />
