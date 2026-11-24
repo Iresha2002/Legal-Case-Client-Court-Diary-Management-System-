@@ -15,6 +15,7 @@ import AddCasePage from './pages/jl/cases/AddCasePage.jsx';
 import EditCasePage from './pages/jl/cases/EditCasePage.jsx';
 import CaseDetailsPage from './pages/jl/cases/CaseDetailsPage.jsx';
 import AccessRequestsPage from './pages/jl/AccessRequestsPage.jsx';
+import CourtCalendarPage from './pages/jl/calendar/CourtCalendarPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -52,7 +53,7 @@ function App() {
           <Route path=":caseId" element={<CaseDetailsPage />} />
           <Route path=":caseId/edit" element={<EditCasePage />} />
         </Route>
-        <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />
+        <Route path="calendar" element={<CourtCalendarPage />} />
         <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
         <Route path="access-requests" element={<AccessRequestsPage />} />
         <Route path="activity" element={<ComingSoonPage title="Activity History" />} />
