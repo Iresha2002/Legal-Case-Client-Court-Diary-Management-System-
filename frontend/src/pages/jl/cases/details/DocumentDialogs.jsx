@@ -234,7 +234,7 @@ export function ViewDocumentDialog({ doc, onClose }) {
           <a
             href={doc.url}
             download={doc.name}
-            className="flex items-center justify-center rounded-sm border border-border-strong bg-bg-surface px-5 py-3 text-body font-medium text-text-primary hover:bg-neutral-100"
+            className="flex items-center justify-center rounded-sm border border-border-strong bg-bg-surface px-5 py-3 text-body font-medium text-text-primary hover:bg-bg-page"
           >
             Download
           </a>
