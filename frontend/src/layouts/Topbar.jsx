@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, ChevronDown, LogOut, Search, Settings, UserRound } from 'lucide-react';
 import { logout } from '../api/auth.js';
 import { clearSession } from '../auth/session.js';
+import { initials } from '../utils/format.js';
 
 // Names shown to the user for the roles the backend puts in the token.
 const ROLE_LABELS = {
@@ -10,16 +11,6 @@ const ROLE_LABELS = {
   ROLE_JUNIOR_LAWYER: 'Junior Lawyer',
   ROLE_CLERK: 'Clerk',
 };
-
-// "Dev Junior Lawyer" -> "DJ"
-function initials(name = '') {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
-    .join('');
-}
 
 const menuItemClass =
   'flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-body text-text-primary hover:bg-bg-page disabled:opacity-60';
@@ -109,7 +100,7 @@ function ProfileMenu({ session, onLogout }) {
 // Top bar: search, notifications and the profile menu.
 export default function Topbar({ session, onLogout }) {
   return (
-    <header className="flex items-center justify-between gap-6 border-b border-border-default bg-bg-surface px-8 py-3">
+    <header className="flex items-center justify-between gap-6 border-b border-border-default bg-bg-surface px-8 py-3 print:hidden">
       <label className="flex w-full max-w-[460px] items-center gap-3 rounded-full border border-border-default bg-bg-page px-4 py-2.5">
         <Search size={18} className="text-text-secondary" />
         <input

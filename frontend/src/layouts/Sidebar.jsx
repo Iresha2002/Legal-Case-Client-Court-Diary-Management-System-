@@ -15,8 +15,8 @@ const LINKS = [
 
 export default function Sidebar() {
   return (
-    // sticky + h-screen keeps the sidebar in place while the page scrolls.
-    <aside className="sticky top-0 flex h-screen w-[280px] shrink-0 flex-col justify-between overflow-y-auto bg-bg-sidebar px-4 py-8">
+    // sticky + h-screen keeps the sidebar in place while the page scrolls. Hidden when printing.
+    <aside className="sticky top-0 flex h-screen w-[280px] shrink-0 flex-col justify-between overflow-y-auto bg-bg-sidebar px-4 py-8 print:hidden">
       <div className="flex flex-col gap-10">
         <div className="flex items-center gap-3 px-3">
           <img src={scaleIcon} alt="" width="32" height="32" />

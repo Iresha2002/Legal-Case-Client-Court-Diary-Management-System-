@@ -4,23 +4,10 @@ import { Eye, Pencil } from 'lucide-react';
 import Button from '../../../components/ui/Button.jsx';
 import Checkbox from '../../../components/ui/Checkbox.jsx';
 import Pagination from '../../../components/ui/Pagination.jsx';
+import Badge from '../../../components/ui/Badge.jsx';
+import { initials } from '../../../utils/format.js';
 
 const PAGE_SIZE = 6;
-
-const STATUS_STYLES = {
-  Active: 'bg-action-primary text-text-inverse',
-  Pending: 'bg-border-default text-text-primary',
-};
-
-// "Nimal Perera" -> "NP"
-function initials(name) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
-    .join('');
-}
 
 const headerCell = 'px-4 py-4 text-left text-label font-semibold tracking-[0.06em] text-text-secondary';
 const iconLink = 'rounded-sm p-1.5 text-text-primary transition-colors hover:bg-bg-page';
@@ -97,13 +84,7 @@ export default function ClientsPage() {
                     </div>
                   </td>
                   <td className="px-4 py-5">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-caption font-medium ${
-                        STATUS_STYLES[client.status] ?? STATUS_STYLES.Pending
-                      }`}
-                    >
-                      {client.status}
-                    </span>
+                    <Badge variant={client.status === 'Active' ? 'dark' : 'muted'}>{client.status}</Badge>
                   </td>
                   <td className="px-4 py-5">
                     <div className="flex items-center gap-2">
