@@ -8,8 +8,8 @@ const MAX_CHIPS = 2; // hearings shown in a month cell before "+N more"
 // Completed hearings are grey and upcoming ones black, like the Figma month view.
 function chipClass(entry) {
   return entry.hearing.status === 'Completed'
-    ? 'bg-border-default text-text-primary hover:bg-neutral-300'
-    : 'bg-action-primary text-text-inverse hover:bg-neutral-800';
+    ? 'bg-border-default text-text-primary hover:opacity-80'
+    : 'bg-action-primary text-text-inverse hover:bg-action-primary/85';
 }
 
 function hearingLabel(entry) {
@@ -48,7 +48,7 @@ export function MonthView({ date, byDate, todayValue, onOpenDay }) {
                       ? 'bg-action-primary font-semibold text-text-inverse'
                       : inMonth
                         ? 'text-text-primary'
-                        : 'text-neutral-300'
+                        : 'text-text-secondary opacity-50'
                   }`}
                 >
                   {day.getDate()}
