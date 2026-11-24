@@ -1,0 +1,8 @@
+-- Run as diary_admin in the application database, including for existing volumes.
+GRANT USAGE ON SCHEMA public TO diary_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO diary_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO diary_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO diary_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO diary_app;
