@@ -20,6 +20,7 @@ import RemindersLayout from './pages/jl/reminders/RemindersLayout.jsx';
 import RemindersPage from './pages/jl/reminders/RemindersPage.jsx';
 import AddReminderPage from './pages/jl/reminders/AddReminderPage.jsx';
 import EditReminderPage from './pages/jl/reminders/EditReminderPage.jsx';
+import ActivityHistoryPage from './pages/jl/activity/ActivityHistoryPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -64,7 +65,7 @@ function App() {
           <Route path=":reminderId/edit" element={<EditReminderPage />} />
         </Route>
         <Route path="access-requests" element={<AccessRequestsPage />} />
-        <Route path="activity" element={<ComingSoonPage title="Activity History" />} />
+        <Route path="activity" element={<ActivityHistoryPage />} />
         <Route path="settings" element={<ComingSoonPage title="Settings" />} />
         {/* Unknown URLs go back to the dashboard. */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
