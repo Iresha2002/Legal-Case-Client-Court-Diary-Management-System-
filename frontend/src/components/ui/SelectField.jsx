@@ -29,11 +29,16 @@ export default function SelectField({ label, error, placeholder, options, value,
           <option value="" disabled>
             {placeholder}
           </option>
-          {options.map((option) => (
-            <option key={option} value={option} className="text-text-primary">
-              {option}
-            </option>
-          ))}
+          {options.map((option) => {
+            // An option is a string, or { value, label } when the shown text differs from the value.
+            const { value: optionValue, label: optionLabel } =
+              typeof option === 'string' ? { value: option, label: option } : option;
+            return (
+              <option key={optionValue} value={optionValue} className="text-text-primary">
+                {optionLabel}
+              </option>
+            );
+          })}
         </select>
         <ChevronDown size={18} className="pointer-events-none absolute right-4 text-text-primary" aria-hidden="true" />
       </div>
