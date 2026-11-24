@@ -4,8 +4,8 @@ import { CASE_STATUSES } from '../caseOptions.js';
 
 // Button style for each status, like the Figma "Ongoing ⌄" / "Closed ⌄" buttons.
 const BUTTON_STYLES = {
-  Ongoing: 'border-action-primary bg-action-primary text-text-inverse hover:bg-neutral-800',
-  Pending: 'border-border-default bg-border-default text-text-primary hover:bg-neutral-300',
+  Ongoing: 'border-action-primary bg-action-primary text-text-inverse hover:bg-action-primary/85',
+  Pending: 'border-border-default bg-border-default text-text-primary hover:opacity-80',
   Closed: 'border-border-strong bg-bg-surface text-text-primary hover:bg-bg-page',
 };
 
