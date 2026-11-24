@@ -1,7 +1,8 @@
 // Figma "Cases Overview": donut chart of cases by status, with a legend below.
+// Ongoing uses the theme's primary colour, so it stays visible in dark mode.
 const STATUS_COLORS = {
-  ongoing: '#0a0a0a',
-  pending: '#525252',
+  ongoing: 'var(--color-action-primary)',
+  pending: '#737373',
   closed: '#d4d4d4',
 };
 
