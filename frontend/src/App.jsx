@@ -9,6 +9,7 @@ import ClientsPage from './pages/jl/clients/ClientsPage.jsx';
 import AddClientPage from './pages/jl/clients/AddClientPage.jsx';
 import ClientDetailsPage from './pages/jl/clients/ClientDetailsPage.jsx';
 import EditClientPage from './pages/jl/clients/EditClientPage.jsx';
+import CasesPage from './pages/jl/cases/CasesPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -40,7 +41,8 @@ function App() {
           <Route path=":clientId" element={<ClientDetailsPage />} />
           <Route path=":clientId/edit" element={<EditClientPage />} />
         </Route>
-        <Route path="cases" element={<ComingSoonPage title="Cases" />} />
+        <Route path="cases" element={<CasesPage />} />
+        <Route path="cases/new" element={<ComingSoonPage title="Add New Case" />} />
         <Route path="cases/:caseId" element={<ComingSoonPage title="Case Details" />} />
         <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />
         <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
