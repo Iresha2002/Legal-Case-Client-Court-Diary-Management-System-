@@ -14,6 +14,7 @@ import CasesPage from './pages/jl/cases/CasesPage.jsx';
 import AddCasePage from './pages/jl/cases/AddCasePage.jsx';
 import EditCasePage from './pages/jl/cases/EditCasePage.jsx';
 import CaseDetailsPage from './pages/jl/cases/CaseDetailsPage.jsx';
+import AccessRequestsPage from './pages/jl/AccessRequestsPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -53,7 +54,7 @@ function App() {
         </Route>
         <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />
         <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
-        <Route path="access-requests" element={<ComingSoonPage title="Access Requests" />} />
+        <Route path="access-requests" element={<AccessRequestsPage />} />
         <Route path="activity" element={<ComingSoonPage title="Activity History" />} />
         <Route path="settings" element={<ComingSoonPage title="Settings" />} />
         {/* Unknown URLs go back to the dashboard. */}
