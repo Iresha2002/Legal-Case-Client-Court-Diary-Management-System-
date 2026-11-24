@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage.jsx';
-import HomePage from './pages/HomePage.jsx';
+import AppLayout from './layouts/AppLayout.jsx';
+import DashboardPage from './pages/jl/DashboardPage.jsx';
+import ComingSoonPage from './pages/jl/ComingSoonPage.jsx';
 import { clearSession, getSession } from './auth/session.js';
 
 function App() {
@@ -21,7 +24,23 @@ function App() {
   if (!session) {
     return <LoginPage onLogin={setSession} />;
   }
-  return <HomePage session={session} onLogout={() => setSession(null)} />;
+  return (
+    <Routes>
+      <Route element={<AppLayout session={session} onLogout={() => setSession(null)} />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="clients" element={<ComingSoonPage title="Clients" />} />
+        <Route path="cases" element={<ComingSoonPage title="Cases" />} />
+        <Route path="calendar" element={<ComingSoonPage title="Court Calendar" />} />
+        <Route path="reminders" element={<ComingSoonPage title="Reminders" />} />
+        <Route path="access-requests" element={<ComingSoonPage title="Access Requests" />} />
+        <Route path="activity" element={<ComingSoonPage title="Activity History" />} />
+        <Route path="settings" element={<ComingSoonPage title="Settings" />} />
+        {/* Unknown URLs go back to the dashboard. */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Route>
+    </Routes>
+  );
 }
 
 export default App;
